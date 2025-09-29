@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Finn Mac</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'main/style.css' %}">
+</head>
+<body>
+    <h1>Finn Mac</h1>
+    <div class="image-container">
+        {% if image %}
+            <img src="{{ image.image.url }}" alt="{{ image.title }}">
+            {% if image.title %}
+                <p>{{ image.title }}</p>
+            {% endif %}
+        {% else %}
+            <p>No image uploaded yet. Add one in the admin.</p>
+        {% endif %}
+    </div>
+</body>
+</html>
