@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="exhibitions">
+    <h1>Exhibitions</h1>
+    <ul>
+        {% for exhibition in exhibitions %}
+            <li>
+                <h2>{{ exhibition.title }}</h2>
+                <p>{{ exhibition.date }}</p>
+                <p>{{ exhibition.description }}</p>
+            </li>
+        {% endfor %}
+    </ul>
+</div>
+{% endblock %}

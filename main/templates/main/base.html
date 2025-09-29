@@ -1,0 +1,59 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Finn-Mac</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{% static 'main/style.css' %}">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header>
+            <div class="site-title">
+                <a href="{% url 'home' %}">Finn-Mac</a>
+            </div>
+
+            <!-- Desktop Navigation -->
+            <nav class="navbar" id="navbar">
+                <a href="{% url 'home' %}">Home</a>
+                <a href="{% url 'blog_list' %}">Blog</a>
+                <a href="{% url 'exhibitions' %}">Exhibitions</a>
+                <a href="{% url 'shop' %}">Shop</a>
+                <a href="{% url 'info' %}">Info</a>
+            </nav>
+
+            <!-- Hamburger Toggle for Mobile -->
+            <div class="hamburger" onclick="toggleMenu()">☰</div>
+        </header>
+
+        <!-- Mobile Navigation -->
+        <div class="mobile-menu" id="mobileMenu">
+            <div class="close-btn" onclick="toggleMenu()">×</div>
+            <a href="{% url 'home' %}" onclick="toggleMenu()">Home</a>
+            <a href="{% url 'blog_list' %}" onclick="toggleMenu()">Blog</a>
+            <a href="{% url 'exhibitions' %}" onclick="toggleMenu()">Exhibitions</a>
+            <a href="{% url 'shop' %}" onclick="toggleMenu()">Shop</a>
+            <a href="{% url 'info' %}" onclick="toggleMenu()">Info</a>
+        </div>
+
+        <!-- Main Content -->
+        <main>
+            {% block content %}{% endblock %}
+        </main>
+
+        <!-- Footer -->
+        <footer>
+            <p>&copy; {% now "Y" %} Finn-Mac. All rights reserved.</p>
+        </footer>
+    </div>
+
+    <script>
+        function toggleMenu() {
+            const menu = document.getElementById('mobileMenu');
+            menu.classList.toggle('open');
+        }
+    </script>
+</body>
+</html>
