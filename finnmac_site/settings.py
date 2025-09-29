@@ -13,8 +13,8 @@ DEBUG = os.getenv("DEBUG", "True") == "True"
 
 # HOSTS
 ALLOWED_HOSTS = [
-    "finnmac.com",
-    "www.finnmac.com",
+    "finnmccormack.co.uk",
+    "www.finnmccormack.co.uk",
     "finnmac-production.up.railway.app",
     ".railway.app",  # ✅ allow any Railway subdomain
     "127.0.0.1",
@@ -22,20 +22,22 @@ ALLOWED_HOSTS = [
 ]
 
 CSRF_TRUSTED_ORIGINS = [
-    "https://finnmac.com",
-    "https://www.finnmac.com",
+    "https://finnmccormack.co.uk",
+    "https://www.finnmccormack.co.uk",
+    "https://finnmac-production.up.railway.app",
 ]
 
 if not DEBUG:
     ALLOWED_HOSTS = [
-        "finnmac.com",
-        "www.finnmac.com",
+        "finnmccormack.co.uk",
+        "www.finnmccormack.co.uk",
         "finnmac-production.up.railway.app",
         ".railway.app",
     ]
     CSRF_TRUSTED_ORIGINS = [
-        "https://finnmac.com",
-        "https://www.finnmac.com",
+        "https://finnmccormack.co.uk",
+        "https://www.finnmccormack.co.uk",
+        "https://finnmac-production.up.railway.app",
     ]
 
 # APPLICATIONS
