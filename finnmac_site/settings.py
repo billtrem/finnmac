@@ -12,33 +12,16 @@ SECRET_KEY = os.getenv("SECRET_KEY", "django-insecure-change-this-key")
 DEBUG = os.getenv("DEBUG", "True") == "True"
 
 # HOSTS
-ALLOWED_HOSTS = [
-    "finnmccormack.co.uk",
-    "www.finnmccormack.co.uk",
-    "finnmac-production.up.railway.app",
-    ".railway.app",  # ✅ allow any Railway subdomain
-    "127.0.0.1",
-    "localhost",
-]
+ALLOWED_HOSTS = ["*"]  # ✅ TEMP allow all while debugging
 
 CSRF_TRUSTED_ORIGINS = [
     "https://finnmccormack.co.uk",
+    "http://finnmccormack.co.uk",
     "https://www.finnmccormack.co.uk",
+    "http://www.finnmccormack.co.uk",
     "https://finnmac-production.up.railway.app",
+    "http://finnmac-production.up.railway.app",
 ]
-
-if not DEBUG:
-    ALLOWED_HOSTS = [
-        "finnmccormack.co.uk",
-        "www.finnmccormack.co.uk",
-        "finnmac-production.up.railway.app",
-        ".railway.app",
-    ]
-    CSRF_TRUSTED_ORIGINS = [
-        "https://finnmccormack.co.uk",
-        "https://www.finnmccormack.co.uk",
-        "https://finnmac-production.up.railway.app",
-    ]
 
 # APPLICATIONS
 INSTALLED_APPS = [
@@ -88,7 +71,7 @@ WSGI_APPLICATION = "finnmac_site.wsgi.application"
 # DATABASE
 DATABASES = {
     "default": dj_database_url.config(
-        default=f"sqlite:///{BASE_DIR / 'db.sqlite3'}",  # ✅ fallback for local dev
+        default=f"sqlite:///{BASE_DIR / 'db.sqlite3'}",
         conn_max_age=600,
         ssl_require=not DEBUG,
     )
@@ -133,18 +116,15 @@ if DEBUG:
     SESSION_COOKIE_SECURE = False
     CSRF_COOKIE_SECURE = False
 else:
-    # Only redirect if proxy header says it's HTTPS
-    SECURE_SSL_REDIRECT = True
+    # Don’t force redirect until we confirm HTTPS is stable
+    SECURE_SSL_REDIRECT = False
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
-
-    # Trust Cloudflare/Railway to tell us the real scheme
     SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 
-    # Start with HSTS disabled until HTTPS is confirmed stable
-    SECURE_HSTS_SECONDS = 0  # set >0 later (e.g. 31536000 for 1y)
+    # Disable HSTS for now — enable later once site is stable
+    SECURE_HSTS_SECONDS = 0
     SECURE_HSTS_INCLUDE_SUBDOMAINS = False
     SECURE_HSTS_PRELOAD = False
 
 X_FRAME_OPTIONS = "DENY"
-
