@@ -22,11 +22,11 @@ RUN python manage.py collectstatic --noinput
 CMD bash -c "\
   python manage.py migrate --noinput && \
   python manage.py collectstatic --noinput && \
-  echo 'from django.contrib.auth.models import User; import os; \
-if not User.objects.filter(username=os.environ.get(\"DJANGO_SUPERUSER_USERNAME\")).exists(): \
-    User.objects.create_superuser( \
-        os.environ.get(\"DJANGO_SUPERUSER_USERNAME\"), \
-        os.environ.get(\"DJANGO_SUPERUSER_EMAIL\"), \
-        os.environ.get(\"DJANGO_SUPERUSER_PASSWORD\") \
-    )' | python manage.py shell && \
+  echo 'import os; from django.contrib.auth.models import User; \
+username=os.environ.get(\"DJANGO_SUPERUSER_USERNAME\"); \
+email=os.environ.get(\"DJANGO_SUPERUSER_EMAIL\"); \
+password=os.environ.get(\"DJANGO_SUPERUSER_PASSWORD\"); \
+if not User.objects.filter(username=username).exists(): \
+    User.objects.create_superuser(username, email, password)' \
+  | python manage.py shell && \
   gunicorn finnmac_site.wsgi:application --bind 0.0.0.0:${PORT:-8000} --workers 4"
