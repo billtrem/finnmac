@@ -12,15 +12,19 @@ SECRET_KEY = os.getenv("SECRET_KEY", "django-insecure-change-this-key")
 DEBUG = os.getenv("DEBUG", "True") == "True"
 
 # HOSTS
-ALLOWED_HOSTS = ["*"]  # ✅ TEMP allow all while debugging
+ALLOWED_HOSTS = [
+    "finnmccormack.co.uk",
+    "www.finnmccormack.co.uk",
+    "finnmac-production.up.railway.app",
+    ".railway.app",
+    "127.0.0.1",
+    "localhost",
+]
 
 CSRF_TRUSTED_ORIGINS = [
     "https://finnmccormack.co.uk",
-    "http://finnmccormack.co.uk",
     "https://www.finnmccormack.co.uk",
-    "http://www.finnmccormack.co.uk",
     "https://finnmac-production.up.railway.app",
-    "http://finnmac-production.up.railway.app",
 ]
 
 # APPLICATIONS
@@ -116,15 +120,19 @@ if DEBUG:
     SESSION_COOKIE_SECURE = False
     CSRF_COOKIE_SECURE = False
 else:
-    # Don’t force redirect until we confirm HTTPS is stable
-    SECURE_SSL_REDIRECT = False
-    SESSION_COOKIE_SECURE = True
-    CSRF_COOKIE_SECURE = True
+    # Force HTTPS (important for Chrome/Edge security)
+    SECURE_SSL_REDIRECT = True
+
+    # Trust Cloudflare proxy headers
     SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 
-    # Disable HSTS for now — enable later once site is stable
-    SECURE_HSTS_SECONDS = 0
-    SECURE_HSTS_INCLUDE_SUBDOMAINS = False
-    SECURE_HSTS_PRELOAD = False
+    # Secure cookies
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+
+    # Enable HSTS once HTTPS works fine
+    SECURE_HSTS_SECONDS = 31536000  # 1 year
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+    SECURE_HSTS_PRELOAD = True
 
 X_FRAME_OPTIONS = "DENY"

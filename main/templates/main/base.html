@@ -20,7 +20,19 @@
                 <a href="{% url 'home' %}">Home</a>
                 <a href="{% url 'blog_list' %}">Blog</a>
                 <a href="{% url 'exhibitions' %}">Exhibitions</a>
-                <a href="{% url 'shop' %}">Shop</a>
+
+                <!-- Services Dropdown -->
+                <div class="dropdown">
+                    <button class="dropbtn">Services ▾</button>
+                    <div class="dropdown-content">
+                        <a href="{% url 'composer' %}">Composer</a>
+                        <a href="{% url 'post_production_audio' %}">Post-Production Audio</a>
+                        <a href="{% url 'sound_design' %}">Sound Design</a>
+                        <a href="{% url 'sound_recordist' %}">Sound Recordist</a>
+                    </div>
+                </div>
+
+                <a href="{% url 'projects' %}">Projects</a>
                 <a href="{% url 'info' %}">Info</a>
             </nav>
 
@@ -34,7 +46,19 @@
             <a href="{% url 'home' %}" onclick="toggleMenu()">Home</a>
             <a href="{% url 'blog_list' %}" onclick="toggleMenu()">Blog</a>
             <a href="{% url 'exhibitions' %}" onclick="toggleMenu()">Exhibitions</a>
-            <a href="{% url 'shop' %}" onclick="toggleMenu()">Shop</a>
+
+            <!-- Services Dropdown for Mobile -->
+            <div class="mobile-dropdown">
+                <span onclick="toggleMobileDropdown()">Services ▾</span>
+                <div class="mobile-dropdown-content" id="mobileServices">
+                    <a href="{% url 'composer' %}" onclick="toggleMenu()">Composer</a>
+                    <a href="{% url 'post_production_audio' %}" onclick="toggleMenu()">Post-Production Audio</a>
+                    <a href="{% url 'sound_design' %}" onclick="toggleMenu()">Sound Design</a>
+                    <a href="{% url 'sound_recordist' %}" onclick="toggleMenu()">Sound Recordist</a>
+                </div>
+            </div>
+
+            <a href="{% url 'projects' %}" onclick="toggleMenu()">Projects</a>
             <a href="{% url 'info' %}" onclick="toggleMenu()">Info</a>
         </div>
 
@@ -53,6 +77,11 @@
         function toggleMenu() {
             const menu = document.getElementById('mobileMenu');
             menu.classList.toggle('open');
+        }
+
+        function toggleMobileDropdown() {
+            const services = document.getElementById('mobileServices');
+            services.classList.toggle('open');
         }
     </script>
 </body>

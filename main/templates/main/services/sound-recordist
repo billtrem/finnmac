@@ -1,0 +1,8 @@
+{% extends "main/base.html" %}
+
+{% block content %}
+<div class="page service-page">
+    <h1>Sound Recordist</h1>
+    <p>Location sound recording for film, TV, and live events. Experienced in capturing clean dialogue and rich environmental audio.</p>
+</div>
+{% endblock %}

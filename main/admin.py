@@ -1,12 +1,11 @@
 from django.contrib import admin
 from django.utils.html import format_html
-from .models import HomepageImage, InfoPageContent, BlogPost, Exhibition, Product
+from .models import HomepageImage, InfoPageContent, BlogPost, Exhibition, Project
 
 
 # -------------------------
 # Homepage Content
 # -------------------------
-
 @admin.register(HomepageImage)
 class HomepageImageAdmin(admin.ModelAdmin):
     list_display = ("caption", "image_preview")
@@ -22,7 +21,6 @@ class HomepageImageAdmin(admin.ModelAdmin):
 # -------------------------
 # Info Page Content
 # -------------------------
-
 @admin.register(InfoPageContent)
 class InfoPageContentAdmin(admin.ModelAdmin):
     list_display = ("bio", "contact_email")
@@ -32,7 +30,6 @@ class InfoPageContentAdmin(admin.ModelAdmin):
 # -------------------------
 # Blog
 # -------------------------
-
 @admin.register(BlogPost)
 class BlogPostAdmin(admin.ModelAdmin):
     list_display = ("title", "created_at", "preview_image_tag")
@@ -53,7 +50,6 @@ class BlogPostAdmin(admin.ModelAdmin):
 # -------------------------
 # Exhibitions
 # -------------------------
-
 @admin.register(Exhibition)
 class ExhibitionAdmin(admin.ModelAdmin):
     list_display = ("title", "status", "date", "location", "image_preview")
@@ -69,18 +65,18 @@ class ExhibitionAdmin(admin.ModelAdmin):
 
 
 # -------------------------
-# Shop / Products
+# Projects
 # -------------------------
-
-@admin.register(Product)
-class ProductAdmin(admin.ModelAdmin):
-    list_display = ("title", "price", "is_available", "product_image_preview")
-    list_filter = ("is_available",)
+@admin.register(Project)
+class ProjectAdmin(admin.ModelAdmin):
+    list_display = ("title", "is_published", "created_at", "project_image_preview")
+    list_filter = ("is_published", "created_at")
     search_fields = ("title", "description")
-    readonly_fields = ("product_image_preview",)
+    prepopulated_fields = {"slug": ("title",)}
+    readonly_fields = ("project_image_preview",)
 
-    def product_image_preview(self, obj):
+    def project_image_preview(self, obj):
         if obj.image:
             return format_html('<img src="{}" width="150" />', obj.image.url)
         return "-"
-    product_image_preview.short_description = "Product Image"
+    project_image_preview.short_description = "Project Image"

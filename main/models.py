@@ -5,7 +5,6 @@ from django.utils.text import slugify
 # -------------------------
 # Homepage Content
 # -------------------------
-
 class HomepageImage(models.Model):
     image = models.ImageField(upload_to="homepage_carousel/")
     caption = models.CharField(max_length=200, blank=True)
@@ -21,7 +20,6 @@ class HomepageImage(models.Model):
 # -------------------------
 # Info Page
 # -------------------------
-
 class InfoPageContent(models.Model):
     portrait = models.ImageField(upload_to="info/", null=True, blank=True)
     bio = models.TextField(help_text="Finn-Mac’s bio or artist statement")
@@ -38,7 +36,6 @@ class InfoPageContent(models.Model):
 # -------------------------
 # Blog
 # -------------------------
-
 class BlogPost(models.Model):
     title = models.CharField(max_length=200)
     slug = models.SlugField(unique=True, max_length=200)
@@ -53,7 +50,6 @@ class BlogPost(models.Model):
 # -------------------------
 # Exhibitions
 # -------------------------
-
 class Exhibition(models.Model):
     STATUS_CHOICES = [
         ("upcoming", "Upcoming"),
@@ -73,16 +69,51 @@ class Exhibition(models.Model):
 
 
 # -------------------------
-# Shop / Products
+# Projects
 # -------------------------
-
-class Product(models.Model):
-    title = models.CharField(max_length=100)
+class Project(models.Model):
+    title = models.CharField(max_length=200)
+    slug = models.SlugField(unique=True, max_length=200, blank=True)
     description = models.TextField()
-    image = models.ImageField(upload_to="product_images/")
-    price = models.DecimalField(max_digits=6, decimal_places=2)
-    sumup_link = models.URLField(help_text="Paste the SumUp payment link here")
-    is_available = models.BooleanField(default=True)
+    image = models.ImageField(upload_to="projects/", null=True, blank=True)
+    link = models.URLField(
+        null=True, blank=True, help_text="Optional external link (e.g. Bandcamp, Vimeo)"
+    )
+    is_published = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.title)
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return self.title
+
+
+# -------------------------
+# Services
+# -------------------------
+class Service(models.Model):
+    SERVICE_CHOICES = [
+        ("composer", "Composer"),
+        ("post_production_audio", "Post-Production Audio"),
+        ("sound_design", "Sound Design"),
+        ("sound_recordist", "Sound Recordist"),
+    ]
+
+    name = models.CharField(max_length=100, choices=SERVICE_CHOICES, unique=True)
+    title = models.CharField(max_length=200, help_text="Display title for the service")
+    slug = models.SlugField(unique=True, max_length=200, blank=True)
+    description = models.TextField()
+    image = models.ImageField(upload_to="services/", null=True, blank=True)
+    is_published = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.title or self.name)
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        return self.get_name_display()

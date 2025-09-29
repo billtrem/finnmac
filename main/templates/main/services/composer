@@ -1,0 +1,7 @@
+{% extends "main/base.html" %}
+{% block content %}
+  <section class="page-section">
+      <h1>Composer</h1>
+      <p>Details about Finn’s composition work go here.</p>
+  </section>
+{% endblock %}
