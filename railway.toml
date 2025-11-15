@@ -2,10 +2,10 @@
 builder = "heroku/buildpacks:20"
 
 [deploy]
-start = "gunicorn spacejunk.wsgi:application --bind 0.0.0.0:$PORT"
-migrations = true    # ← ADD THIS LINE
+start = "gunicorn finnmac_site.wsgi:application --bind 0.0.0.0:$PORT"
+migrations = true
 
 [env]
+DJANGO_SETTINGS_MODULE = "finnmac_site.settings"
 PYTHONUNBUFFERED = "1"
 PORT = "8080"
-DJANGO_SETTINGS_MODULE = "spacejunk.settings"
