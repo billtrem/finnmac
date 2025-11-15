@@ -3,15 +3,12 @@ import os
 import dj_database_url
 from dotenv import load_dotenv
 
-# ---------------------------------------------------------------------
+# ---------------------------------------------------------
 # BASE + ENV
-# ---------------------------------------------------------------------
+# ---------------------------------------------------------
 BASE_DIR = Path(__file__).resolve().parent.parent
 load_dotenv(BASE_DIR / ".env")
 
-# ---------------------------------------------------------------------
-# SECURITY
-# ---------------------------------------------------------------------
 SECRET_KEY = os.getenv("SECRET_KEY", "django-insecure-change-this-key")
 DEBUG = os.getenv("DEBUG", "True") == "True"
 
@@ -30,9 +27,9 @@ CSRF_TRUSTED_ORIGINS = [
     "https://finnmac-production.up.railway.app",
 ]
 
-# ---------------------------------------------------------------------
-# INSTALLED APPS
-# ---------------------------------------------------------------------
+# ---------------------------------------------------------
+# APPS
+# ---------------------------------------------------------
 INSTALLED_APPS = [
     "django.contrib.admin",
     "django.contrib.auth",
@@ -47,9 +44,9 @@ INSTALLED_APPS = [
     "cloudinary_storage",
 ]
 
-# ---------------------------------------------------------------------
+# ---------------------------------------------------------
 # MIDDLEWARE
-# ---------------------------------------------------------------------
+# ---------------------------------------------------------
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",
@@ -81,9 +78,9 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "finnmac_site.wsgi.application"
 
-# ---------------------------------------------------------------------
-# DATABASE
-# ---------------------------------------------------------------------
+# ---------------------------------------------------------
+# DATABASE — Auto-detect Railway Postgres
+# ---------------------------------------------------------
 DATABASES = {
     "default": dj_database_url.config(
         default=f"sqlite:///{BASE_DIR / 'db.sqlite3'}",
@@ -92,15 +89,18 @@ DATABASES = {
     )
 }
 
-# ---------------------------------------------------------------------
-# ALLOW MIGRATIONS ON RAILWAY (IMPORTANT!)
-# ---------------------------------------------------------------------
+# ---------------------------------------------------------
+# MIGRATIONS — FULLY ENABLED IN PRODUCTION
+# ---------------------------------------------------------
 if os.getenv("RAILWAY_ENVIRONMENT") == "production":
-    print("⚠️ Railway production detected — migrations ENABLED so new fields apply.")
+    print("🟢 Railway production detected — migrations ENABLED.")
+    # Do NOT override MIGRATION_MODULES — that blocks migrations.
+else:
+    print("🟡 Local development mode")
 
-# ---------------------------------------------------------------------
+# ---------------------------------------------------------
 # PASSWORD VALIDATION
-# ---------------------------------------------------------------------
+# ---------------------------------------------------------
 AUTH_PASSWORD_VALIDATORS = [
     {"NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"},
     {"NAME": "django.contrib.auth.password_validation.MinimumLengthValidator"},
@@ -108,27 +108,31 @@ AUTH_PASSWORD_VALIDATORS = [
     {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator"},
 ]
 
-# ---------------------------------------------------------------------
+# ---------------------------------------------------------
 # LOCALIZATION
-# ---------------------------------------------------------------------
+# ---------------------------------------------------------
 LANGUAGE_CODE = "en-us"
 TIME_ZONE = "UTC"
 USE_I18N = True
 USE_TZ = True
 
-# ---------------------------------------------------------------------
-# STATIC / MEDIA
-# ---------------------------------------------------------------------
+# ---------------------------------------------------------
+# STATIC FILES
+# ---------------------------------------------------------
 STATIC_URL = "/static/"
 STATICFILES_DIRS = [BASE_DIR / "main" / "static"]
 STATIC_ROOT = BASE_DIR / "staticfiles"
 STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
+# ---------------------------------------------------------
+# MEDIA — CLOUDINARY
+# ---------------------------------------------------------
 CLOUDINARY_STORAGE = {
     "CLOUD_NAME": os.getenv("CLOUDINARY_CLOUD_NAME"),
     "API_KEY": os.getenv("CLOUDINARY_API_KEY"),
     "API_SECRET": os.getenv("CLOUDINARY_API_SECRET"),
 }
+
 DEFAULT_FILE_STORAGE = "cloudinary_storage.storage.MediaCloudinaryStorage"
 
 MEDIA_URL = "/media/"
@@ -136,9 +140,9 @@ MEDIA_ROOT = BASE_DIR / "media"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-# ---------------------------------------------------------------------
+# ---------------------------------------------------------
 # SECURITY HEADERS
-# ---------------------------------------------------------------------
+# ---------------------------------------------------------
 if DEBUG:
     SECURE_SSL_REDIRECT = False
     SESSION_COOKIE_SECURE = False
@@ -148,6 +152,7 @@ else:
     SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
+
     SECURE_HSTS_SECONDS = 31536000
     SECURE_HSTS_INCLUDE_SUBDOMAINS = True
     SECURE_HSTS_PRELOAD = True
