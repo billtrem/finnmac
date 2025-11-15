@@ -1,4 +1,5 @@
 from django.shortcuts import render, get_object_or_404
+from django.utils.html import linebreaks
 from .models import HomepageImage, InfoPageContent, BlogPost, Exhibition, Project, Service
 
 
@@ -6,18 +7,33 @@ from .models import HomepageImage, InfoPageContent, BlogPost, Exhibition, Projec
 # Homepage
 # -------------------------
 def home(request):
-    """
-    Home page with image carousel and highlights.
-    """
     images = HomepageImage.objects.all().order_by("id")
     latest_posts = BlogPost.objects.all().order_by("-created_at")[:3]
 
-    current_exhibitions = Exhibition.objects.filter(status="current").order_by("date")
-    upcoming_exhibitions = Exhibition.objects.filter(status="upcoming").order_by("date")
-    past_exhibitions = Exhibition.objects.filter(status="past").order_by("-date")[:3]
+    # Format descriptions for exhibitions
+    def fmt_exhibitions(qs):
+        for ex in qs:
+            ex.description_html = linebreaks(ex.description)
+        return qs
 
+    current_exhibitions = fmt_exhibitions(
+        Exhibition.objects.filter(status="current").order_by("date")
+    )
+    upcoming_exhibitions = fmt_exhibitions(
+        Exhibition.objects.filter(status="upcoming").order_by("date")
+    )
+    past_exhibitions = fmt_exhibitions(
+        Exhibition.objects.filter(status="past").order_by("-date")[:3]
+    )
+
+    # Projects formatted
     projects = Project.objects.filter(is_published=True).order_by("-created_at")[:4]
+    for p in projects:
+        p.description_html = linebreaks(p.description)
+
     info = InfoPageContent.objects.first()
+    if info and info.bio:
+        info.bio_html = linebreaks(info.bio)
 
     context = {
         "images": images,
@@ -35,15 +51,24 @@ def home(request):
 # Info Page
 # -------------------------
 def info(request):
-    """
-    Info page with Finn’s bio, portrait, and contact details.
-    """
     info = InfoPageContent.objects.first()
+    if info and info.bio:
+        info.bio_html = linebreaks(info.bio)
 
     current_exhibitions = Exhibition.objects.filter(status="current").order_by("date")
     upcoming_exhibitions = Exhibition.objects.filter(status="upcoming").order_by("date")
 
+    # Format exhibition descriptions
+    for ex in current_exhibitions:
+        ex.description_html = linebreaks(ex.description)
+    for ex in upcoming_exhibitions:
+        ex.description_html = linebreaks(ex.description)
+
+    # Format project descriptions
     projects = Project.objects.filter(is_published=True).order_by("-created_at")[:6]
+    for p in projects:
+        p.description_html = linebreaks(p.description)
+
     services = Service.objects.filter(is_published=True).order_by("created_at")
 
     context = {
@@ -66,6 +91,10 @@ def blog_list_view(request):
 
 def blog_detail_view(request, slug):
     post = get_object_or_404(BlogPost, slug=slug)
+
+    # Apply linebreak formatting
+    post.body_html = linebreaks(post.body)
+
     other_posts = BlogPost.objects.exclude(slug=slug).order_by("-created_at")[:5]
 
     context = {
@@ -83,6 +112,9 @@ def exhibitions(request):
     upcoming_exhibitions = Exhibition.objects.filter(status="upcoming").order_by("date")
     past_exhibitions = Exhibition.objects.filter(status="past").order_by("-date")
 
+    for ex in list(current_exhibitions) + list(upcoming_exhibitions) + list(past_exhibitions):
+        ex.description_html = linebreaks(ex.description)
+
     context = {
         "current_exhibitions": current_exhibitions,
         "upcoming_exhibitions": upcoming_exhibitions,
@@ -96,25 +128,33 @@ def exhibitions(request):
 # -------------------------
 def projects(request):
     projects_qs = Project.objects.filter(is_published=True).order_by("-created_at")
+
+    for p in projects_qs:
+        p.description_html = linebreaks(p.description)
+
     return render(request, "main/projects.html", {"projects": projects_qs})
 
 
 # -------------------------
 # Services (each page has its own template)
 # -------------------------
-
 def _service(request, service_name, template_name):
-    """
-    Loads a Service object based on its `name` field and renders using
-    a specific template in /services/.
-    """
     service = get_object_or_404(Service, name=service_name, is_published=True)
+
+    # Apply formatting
+    service.description_html = linebreaks(service.description)
+    service.process_html = linebreaks(service.process) if service.process else ""
+    service.areas_html = linebreaks(service.areas_of_work) if service.areas_of_work else ""
+
     all_services = Service.objects.filter(is_published=True).order_by("created_at")
 
     return render(
         request,
         template_name,
-        {"service": service, "all_services": all_services},
+        {
+            "service": service,
+            "all_services": all_services,
+        },
     )
 
 

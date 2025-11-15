@@ -4,6 +4,7 @@
 <div class="info-page">
 
     <section class="info-grid">
+
         <div class="info-image">
             {% if info and info.portrait %}
                 <img src="{{ info.portrait.url }}" alt="Portrait of Finn-Mac">
@@ -16,77 +17,20 @@
             {% if info and info.bio %}
                 <p>{{ info.bio|linebreaks }}</p>
             {% else %}
-                <p>Finn-Mac is a composer, sound artist, and collaborator working across film, audio and performance.</p>
+                <p>Finn McCormack is a composer, sound artist, and collaborator working across film, audio and performance.</p>
             {% endif %}
 
-            {% if info and info.contact_email %}
-                <div class="contact-box">
-                    <h3>Contact</h3>
-                    <p>
-                        For commissions, collaborations, or enquiries:<br>
-                        <a href="mailto:{{ info.contact_email }}">{{ info.contact_email }}</a>
-                    </p>
-                </div>
-            {% endif %}
+            <div class="contact-box" style="margin-top: 40px;">
+                <h3>Contact</h3>
+                <p>
+                    <a href="mailto:enquiries@finnmccormack.co.uk">
+                        enquiries@finnmccormack.co.uk
+                    </a>
+                </p>
+            </div>
         </div>
+
     </section>
-
-    {% if current_exhibitions or upcoming_exhibitions %}
-    <section class="home-section">
-        <h2>Exhibitions</h2>
-
-        {% if current_exhibitions %}
-            <h3>Current</h3>
-            <ul class="simple-list">
-                {% for exhibition in current_exhibitions %}
-                    <li>
-                        <strong>{{ exhibition.title }}</strong> ·
-                        {{ exhibition.date|date:"j F Y" }} ·
-                        {{ exhibition.location }}
-                    </li>
-                {% endfor %}
-            </ul>
-        {% endif %}
-
-        {% if upcoming_exhibitions %}
-            <h3>Upcoming</h3>
-            <ul class="simple-list">
-                {% for exhibition in upcoming_exhibitions %}
-                    <li>
-                        <strong>{{ exhibition.title }}</strong> ·
-                        {{ exhibition.date|date:"j F Y" }} ·
-                        {{ exhibition.location }}
-                    </li>
-                {% endfor %}
-            </ul>
-        {% endif %}
-    </section>
-    {% endif %}
-
-    {% if services %}
-    <section class="home-section">
-        <h2>Services</h2>
-        <ul class="simple-list">
-            {% for service in services %}
-                <li>{{ service.title }}</li>
-            {% endfor %}
-        </ul>
-    </section>
-    {% endif %}
-
-    {% if projects %}
-    <section class="home-section">
-        <h2>Selected projects</h2>
-        <div class="project-list">
-            {% for project in projects %}
-                <article class="project-item">
-                    <h3>{{ project.title }}</h3>
-                    <p>{{ project.description|truncatechars:200 }}</p>
-                </article>
-            {% endfor %}
-        </div>
-    </section>
-    {% endif %}
 
 </div>
 {% endblock %}
