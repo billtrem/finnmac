@@ -1,11 +1,18 @@
+# -----------------------------------------
+# Railway TOML for Dockerfile deployment
+# -----------------------------------------
+
 [build]
-builder = "heroku/buildpacks:20"
+# Tell Railway to use the Dockerfile
+dockerfile = "Dockerfile"
 
 [deploy]
-start = "gunicorn finnmac_site.wsgi:application --bind 0.0.0.0:$PORT"
+# Docker will already run your CMD, so start command is NOT needed here
+restart_policy = "on_failure"
+
+# Allow migrations via your Docker CMD script
 migrations = true
 
 [env]
 DJANGO_SETTINGS_MODULE = "finnmac_site.settings"
 PYTHONUNBUFFERED = "1"
-PORT = "8080"

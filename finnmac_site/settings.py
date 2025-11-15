@@ -10,7 +10,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 load_dotenv(BASE_DIR / ".env")
 
 SECRET_KEY = os.getenv("SECRET_KEY", "django-insecure-change-this-key")
-DEBUG = os.getenv("DEBUG", "True") == "True"
+
+# DEBUG: default False on Railway, True locally
+DEBUG = os.getenv("DEBUG", "False").lower() == "true"
 
 ALLOWED_HOSTS = [
     "finnmccormack.co.uk",
@@ -79,7 +81,7 @@ TEMPLATES = [
 WSGI_APPLICATION = "finnmac_site.wsgi.application"
 
 # ---------------------------------------------------------
-# DATABASE — Auto-detect Railway Postgres
+# DATABASE — Railway Postgres auto-detect
 # ---------------------------------------------------------
 DATABASES = {
     "default": dj_database_url.config(
@@ -88,15 +90,6 @@ DATABASES = {
         ssl_require=not DEBUG,
     )
 }
-
-# ---------------------------------------------------------
-# MIGRATIONS — FULLY ENABLED IN PRODUCTION
-# ---------------------------------------------------------
-if os.getenv("RAILWAY_ENVIRONMENT") == "production":
-    print("🟢 Railway production detected — migrations ENABLED.")
-    # Do NOT override MIGRATION_MODULES — that blocks migrations.
-else:
-    print("🟡 Local development mode")
 
 # ---------------------------------------------------------
 # PASSWORD VALIDATION
@@ -120,8 +113,9 @@ USE_TZ = True
 # STATIC FILES
 # ---------------------------------------------------------
 STATIC_URL = "/static/"
-STATICFILES_DIRS = [BASE_DIR / "main" / "static"]
 STATIC_ROOT = BASE_DIR / "staticfiles"
+STATICFILES_DIRS = [BASE_DIR / "main" / "static"]
+
 STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 # ---------------------------------------------------------
@@ -143,11 +137,7 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 # ---------------------------------------------------------
 # SECURITY HEADERS
 # ---------------------------------------------------------
-if DEBUG:
-    SECURE_SSL_REDIRECT = False
-    SESSION_COOKIE_SECURE = False
-    CSRF_COOKIE_SECURE = False
-else:
+if not DEBUG:
     SECURE_SSL_REDIRECT = True
     SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
     SESSION_COOKIE_SECURE = True
@@ -156,5 +146,9 @@ else:
     SECURE_HSTS_SECONDS = 31536000
     SECURE_HSTS_INCLUDE_SUBDOMAINS = True
     SECURE_HSTS_PRELOAD = True
+else:
+    SECURE_SSL_REDIRECT = False
+    SESSION_COOKIE_SECURE = False
+    CSRF_COOKIE_SECURE = False
 
 X_FRAME_OPTIONS = "DENY"
