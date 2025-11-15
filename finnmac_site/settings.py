@@ -3,15 +3,20 @@ import os
 import dj_database_url
 from dotenv import load_dotenv
 
-# Load environment variables
+# -----------------------------------------------------------------------------
+# BASE + ENV
+# -----------------------------------------------------------------------------
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+# Load .env from project root
 load_dotenv(BASE_DIR / ".env")
 
+# -----------------------------------------------------------------------------
 # SECURITY
+# -----------------------------------------------------------------------------
 SECRET_KEY = os.getenv("SECRET_KEY", "django-insecure-change-this-key")
 DEBUG = os.getenv("DEBUG", "True") == "True"
 
-# HOSTS
 ALLOWED_HOSTS = [
     "finnmccormack.co.uk",
     "www.finnmccormack.co.uk",
@@ -27,7 +32,9 @@ CSRF_TRUSTED_ORIGINS = [
     "https://finnmac-production.up.railway.app",
 ]
 
-# APPLICATIONS
+# -----------------------------------------------------------------------------
+# INSTALLED APPS
+# -----------------------------------------------------------------------------
 INSTALLED_APPS = [
     "django.contrib.admin",
     "django.contrib.auth",
@@ -35,15 +42,20 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+
     "main",
+
     "cloudinary",
     "cloudinary_storage",
 ]
 
+# -----------------------------------------------------------------------------
 # MIDDLEWARE
+# -----------------------------------------------------------------------------
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",
+
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -72,7 +84,9 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "finnmac_site.wsgi.application"
 
-# DATABASE
+# -----------------------------------------------------------------------------
+# DATABASE (Railway Postgres automatically)
+# -----------------------------------------------------------------------------
 DATABASES = {
     "default": dj_database_url.config(
         default=f"sqlite:///{BASE_DIR / 'db.sqlite3'}",
@@ -81,7 +95,20 @@ DATABASES = {
     )
 }
 
-# AUTH VALIDATION
+# -----------------------------------------------------------------------------
+# SAFETY: Prevent accidental production migrations
+# -----------------------------------------------------------------------------
+if os.getenv("RAILWAY_ENVIRONMENT") == "production":
+    MIGRATION_MODULES = {"main": None}
+    print("⚠️  PRODUCTION ENVIRONMENT LOADED — migrations disabled for safety.")
+
+# Warning in local terminal when using the LIVE Postgres DB
+if os.getenv("RAILWAY_ENVIRONMENT") == "production":
+    print("🔴 WARNING: You are running Django locally using the LIVE Railway database")
+
+# -----------------------------------------------------------------------------
+# PASSWORD VALIDATION
+# -----------------------------------------------------------------------------
 AUTH_PASSWORD_VALIDATORS = [
     {"NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"},
     {"NAME": "django.contrib.auth.password_validation.MinimumLengthValidator"},
@@ -89,13 +116,17 @@ AUTH_PASSWORD_VALIDATORS = [
     {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator"},
 ]
 
+# -----------------------------------------------------------------------------
 # LOCALIZATION
+# -----------------------------------------------------------------------------
 LANGUAGE_CODE = "en-us"
 TIME_ZONE = "UTC"
 USE_I18N = True
 USE_TZ = True
 
+# -----------------------------------------------------------------------------
 # STATIC & MEDIA
+# -----------------------------------------------------------------------------
 STATIC_URL = "/static/"
 STATICFILES_DIRS = [BASE_DIR / "main" / "static"]
 STATIC_ROOT = BASE_DIR / "staticfiles"
@@ -111,27 +142,23 @@ DEFAULT_FILE_STORAGE = "cloudinary_storage.storage.MediaCloudinaryStorage"
 MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "media"
 
-# DEFAULTS
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
+# -----------------------------------------------------------------------------
 # SECURITY HEADERS
+# -----------------------------------------------------------------------------
 if DEBUG:
     SECURE_SSL_REDIRECT = False
     SESSION_COOKIE_SECURE = False
     CSRF_COOKIE_SECURE = False
 else:
-    # Force HTTPS (important for Chrome/Edge security)
     SECURE_SSL_REDIRECT = True
-
-    # Trust Cloudflare proxy headers
     SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 
-    # Secure cookies
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
 
-    # Enable HSTS once HTTPS works fine
-    SECURE_HSTS_SECONDS = 31536000  # 1 year
+    SECURE_HSTS_SECONDS = 31536000
     SECURE_HSTS_INCLUDE_SUBDOMAINS = True
     SECURE_HSTS_PRELOAD = True
 

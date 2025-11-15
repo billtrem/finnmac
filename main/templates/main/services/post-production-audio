@@ -1,8 +1,0 @@
-{% extends "main/base.html" %}
-
-{% block content %}
-<div class="page service-page">
-    <h1>Post-Production Audio</h1>
-    <p>Professional post-production services including dialogue editing, ADR, foley, and final mixing for broadcast and cinema standards.</p>
-</div>
-{% endblock %}

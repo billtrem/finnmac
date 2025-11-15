@@ -1,0 +1,37 @@
+{% extends "main/base.html" %}
+
+{% block content %}
+<div class="page service-page">
+
+    <h1>{{ service.title }}</h1>
+
+    {% if service.tagline %}
+        <p><strong>{{ service.tagline }}</strong></p>
+    {% endif %}
+
+    {% if service.image %}
+        <div class="service-image">
+            <img src="{{ service.image.url }}" alt="{{ service.title }}">
+        </div>
+    {% endif %}
+
+    <div class="service-description">
+        {{ service.description|linebreaks }}
+    </div>
+
+    {% if service.areas_of_work %}
+        <h2>Areas of Practice</h2>
+        <ul class="simple-list">
+            {% for item in service.areas_of_work.splitlines %}
+                {% if item %}<li>{{ item }}</li>{% endif %}
+            {% endfor %}
+        </ul>
+    {% endif %}
+
+    {% if service.process %}
+        <h2>Approach</h2>
+        <p>{{ service.process|linebreaks }}</p>
+    {% endif %}
+
+</div>
+{% endblock %}

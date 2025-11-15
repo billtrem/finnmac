@@ -92,7 +92,7 @@ class Project(models.Model):
 
 
 # -------------------------
-# Services
+# Services (UPDATED + EXPANDED)
 # -------------------------
 class Service(models.Model):
     SERVICE_CHOICES = [
@@ -102,17 +102,39 @@ class Service(models.Model):
         ("sound_recordist", "Sound Recordist"),
     ]
 
+    # identity
     name = models.CharField(max_length=100, choices=SERVICE_CHOICES, unique=True)
     title = models.CharField(max_length=200, help_text="Display title for the service")
     slug = models.SlugField(unique=True, max_length=200, blank=True)
-    description = models.TextField()
+
+    # content
+    tagline = models.CharField(
+        max_length=255,
+        blank=True,
+        help_text="Short one-line summary displayed under the title",
+    )
+    description = models.TextField(
+        help_text="Main description for the top section of the service page"
+    )
     image = models.ImageField(upload_to="services/", null=True, blank=True)
+
+    # structured content (bullet lists + sections)
+    areas_of_work = models.TextField(
+        blank=True,
+        help_text="One bullet point per line for the list of areas/services",
+    )
+    process = models.TextField(
+        blank=True,
+        help_text="Optional section describing methods, workflow, or approach",
+    )
+
+    # admin
     is_published = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def save(self, *args, **kwargs):
         if not self.slug:
-            self.slug = slugify(self.title or self.name)
+            self.slug = slugify(self.title or self.get_name_display())
         super().save(*args, **kwargs)
 
     def __str__(self):

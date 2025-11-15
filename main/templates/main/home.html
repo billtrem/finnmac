@@ -1,7 +1,194 @@
 {% extends "main/base.html" %}
+
 {% block content %}
 <div class="home">
-    <h1>Finn-Mac</h1>
-    <p>Welcome to the official site of Finn-Mac.</p>
+
+    {# ------------------------- #}
+    {# Hero / Intro              #}
+    {# ------------------------- #}
+    <section class="home-hero">
+        <h1>Finn-Mac</h1>
+        {% if info and info.bio %}
+            <p>{{ info.bio|truncatechars:220 }}</p>
+        {% else %}
+            <p>Composer, sound artist, and collaborator working across film, music, and audio.</p>
+        {% endif %}
+    </section>
+
+    {# ------------------------- #}
+    {# Image Carousel            #}
+    {# ------------------------- #}
+    {% if images %}
+    <section class="carousel-container">
+        <div class="carousel-wrapper">
+            <button class="carousel-btn" id="prevBtn">&#10094;</button>
+
+            <div class="carousel-slide">
+                {% for image in images %}
+                    <div class="slide{% if forloop.first %} active{% endif %}">
+                        <img src="{{ image.image.url }}" alt="{{ image.caption|default:'Homepage image' }}">
+                        {% if image.caption %}
+                            <p class="caption">{{ image.caption }}</p>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+            </div>
+
+            <button class="carousel-btn" id="nextBtn">&#10095;</button>
+        </div>
+    </section>
+    {% endif %}
+
+    {# ------------------------- #}
+    {# Latest Blog Posts         #}
+    {# ------------------------- #}
+    {% if latest_posts %}
+    <section class="home-section">
+        <h2>Latest writing</h2>
+        <div class="blog-list">
+            {% for post in latest_posts %}
+                <article class="blog-preview">
+                    {% if post.preview_image %}
+                        <div class="blog-preview-image">
+                            <a href="{% url 'blog_detail' post.slug %}">
+                                <img src="{{ post.preview_image.url }}" alt="{{ post.title }}">
+                            </a>
+                        </div>
+                    {% endif %}
+                    <div class="blog-preview-text">
+                        <h3>
+                            <a href="{% url 'blog_detail' post.slug %}">{{ post.title }}</a>
+                        </h3>
+                        <p class="blog-meta">
+                            {{ post.created_at|date:"j F Y" }}
+                        </p>
+                        <p>
+                            {{ post.body|truncatechars:220 }}
+                        </p>
+                        <a href="{% url 'blog_detail' post.slug %}" class="read-more-button">
+                            Read more
+                        </a>
+                    </div>
+                </article>
+            {% endfor %}
+        </div>
+    </section>
+    {% endif %}
+
+    {# ------------------------- #}
+    {# Exhibitions               #}
+    {# ------------------------- #}
+    {% if current_exhibitions or upcoming_exhibitions or past_exhibitions %}
+    <section class="home-section">
+        <h2>Exhibitions</h2>
+
+        {% if current_exhibitions %}
+            <h3>Current</h3>
+            <div class="exhibitions-group">
+                {% for exhibition in current_exhibitions %}
+                    <article class="exhibition-card">
+                        {% if exhibition.image %}
+                            <div class="exhibition-image">
+                                <img src="{{ exhibition.image.url }}" alt="{{ exhibition.title }}">
+                            </div>
+                        {% endif %}
+                        <div class="exhibition-text">
+                            <h4>{{ exhibition.title }}</h4>
+                            <p class="exhibition-meta">
+                                {{ exhibition.date|date:"j F Y" }} · {{ exhibition.location }}
+                            </p>
+                            <p>{{ exhibition.description }}</p>
+                        </div>
+                    </article>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        {% if upcoming_exhibitions %}
+            <h3>Upcoming</h3>
+            <div class="exhibitions-group">
+                {% for exhibition in upcoming_exhibitions %}
+                    <article class="exhibition-card">
+                        {% if exhibition.image %}
+                            <div class="exhibition-image">
+                                <img src="{{ exhibition.image.url }}" alt="{{ exhibition.title }}">
+                            </div>
+                        {% endif %}
+                        <div class="exhibition-text">
+                            <h4>{{ exhibition.title }}</h4>
+                            <p class="exhibition-meta">
+                                {{ exhibition.date|date:"j F Y" }} · {{ exhibition.location }}
+                            </p>
+                            <p>{{ exhibition.description }}</p>
+                        </div>
+                    </article>
+                {% endfor %}
+            </div>
+        {% endif %}
+    </section>
+    {% endif %}
+
+    {# ------------------------- #}
+    {# Projects                  #}
+    {# ------------------------- #}
+    {% if projects %}
+    <section class="home-section">
+        <h2>Recent projects</h2>
+        <div class="project-list">
+            {% for project in projects %}
+                <article class="project-item">
+                    {% if project.image %}
+                        <div class="project-image">
+                            <img src="{{ project.image.url }}" alt="{{ project.title }}">
+                        </div>
+                    {% endif %}
+                    <h3>{{ project.title }}</h3>
+                    <p>{{ project.description|truncatechars:200 }}</p>
+                    {% if project.link %}
+                        <p>
+                            <a href="{{ project.link }}" target="_blank" rel="noopener noreferrer" class="read-more-button">
+                                View project
+                            </a>
+                        </p>
+                    {% endif %}
+                </article>
+            {% endfor %}
+        </div>
+    </section>
+    {% endif %}
+
 </div>
+
+<script>
+    // Simple carousel behaviour for desktop
+    (function() {
+        const slides = document.querySelectorAll('.slide');
+        if (!slides.length) return;
+
+        let currentIndex = 0;
+
+        function showSlide(index) {
+            slides.forEach((slide, i) => {
+                slide.style.display = (i === index) ? 'block' : 'none';
+            });
+        }
+
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+
+        if (prevBtn && nextBtn) {
+            prevBtn.addEventListener('click', function () {
+                currentIndex = (currentIndex - 1 + slides.length) % slides.length;
+                showSlide(currentIndex);
+            });
+            nextBtn.addEventListener('click', function () {
+                currentIndex = (currentIndex + 1) % slides.length;
+                showSlide(currentIndex);
+            });
+        }
+
+        // Initial
+        showSlide(currentIndex);
+    })();
+</script>
 {% endblock %}

@@ -1,10 +1,40 @@
 {% extends "main/base.html" %}
+
 {% block content %}
-<div class="blog-detail">
-    <h1>{{ post.title }}</h1>
-    <p>{{ post.published_date }}</p>
-    <div>
-        {{ post.content|safe }}
+<article class="blog-post">
+    <header>
+        <h1>{{ post.title }}</h1>
+        <p class="blog-meta">
+            {{ post.created_at|date:"j F Y" }}
+        </p>
+    </header>
+
+    {% if post.preview_image %}
+        <div class="blog-post-image">
+            <img src="{{ post.preview_image.url }}" alt="{{ post.title }}">
+        </div>
+    {% endif %}
+
+    <div class="blog-post-body">
+        {{ post.body|linebreaks }}
     </div>
-</div>
+
+    {% if other_posts %}
+        <aside class="blog-more">
+            <h2>More posts</h2>
+            <ul>
+                {% for other in other_posts %}
+                    <li>
+                        <a href="{% url 'blog_detail' other.slug %}">
+                            {{ other.title }}
+                        </a>
+                        <span class="blog-meta">
+                            · {{ other.created_at|date:"j M Y" }}
+                        </span>
+                    </li>
+                {% endfor %}
+            </ul>
+        </aside>
+    {% endif %}
+</article>
 {% endblock %}

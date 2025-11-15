@@ -6,74 +6,141 @@ from .models import HomepageImage, InfoPageContent, BlogPost, Exhibition, Projec
 # Homepage
 # -------------------------
 def home(request):
-    """Home page with image carousel"""
-    images = HomepageImage.objects.all()
-    return render(request, "main/home.html", {"images": images})
+    """
+    Home page with image carousel and highlights.
+    """
+    images = HomepageImage.objects.all().order_by("id")
+    latest_posts = BlogPost.objects.all().order_by("-created_at")[:3]
+
+    current_exhibitions = Exhibition.objects.filter(status="current").order_by("date")
+    upcoming_exhibitions = Exhibition.objects.filter(status="upcoming").order_by("date")
+    past_exhibitions = Exhibition.objects.filter(status="past").order_by("-date")[:3]
+
+    projects = Project.objects.filter(is_published=True).order_by("-created_at")[:4]
+    info = InfoPageContent.objects.first()
+
+    context = {
+        "images": images,
+        "latest_posts": latest_posts,
+        "current_exhibitions": current_exhibitions,
+        "upcoming_exhibitions": upcoming_exhibitions,
+        "past_exhibitions": past_exhibitions,
+        "projects": projects,
+        "info": info,
+    }
+    return render(request, "main/home.html", context)
 
 
 # -------------------------
 # Info Page
 # -------------------------
 def info(request):
-    """Info page with Finn’s bio and portrait"""
+    """
+    Info page with Finn’s bio, portrait, and contact details.
+    """
     info = InfoPageContent.objects.first()
-    return render(request, "main/info.html", {"info": info})
+
+    current_exhibitions = Exhibition.objects.filter(status="current").order_by("date")
+    upcoming_exhibitions = Exhibition.objects.filter(status="upcoming").order_by("date")
+
+    projects = Project.objects.filter(is_published=True).order_by("-created_at")[:6]
+    services = Service.objects.filter(is_published=True).order_by("created_at")
+
+    context = {
+        "info": info,
+        "current_exhibitions": current_exhibitions,
+        "upcoming_exhibitions": upcoming_exhibitions,
+        "projects": projects,
+        "services": services,
+    }
+    return render(request, "main/info.html", context)
 
 
 # -------------------------
 # Blog
 # -------------------------
 def blog_list_view(request):
-    """List view of all blog posts"""
     posts = BlogPost.objects.all().order_by("-created_at")
     return render(request, "main/blog_list.html", {"posts": posts})
 
 
 def blog_detail_view(request, slug):
-    """Detailed view of a single blog post"""
     post = get_object_or_404(BlogPost, slug=slug)
-    return render(request, "main/blog_detail.html", {"post": post})
+    other_posts = BlogPost.objects.exclude(slug=slug).order_by("-created_at")[:5]
+
+    context = {
+        "post": post,
+        "other_posts": other_posts,
+    }
+    return render(request, "main/blog_detail.html", context)
 
 
 # -------------------------
 # Exhibitions
 # -------------------------
 def exhibitions(request):
-    """List of exhibitions"""
-    exhibitions = Exhibition.objects.all().order_by("-date")
-    return render(request, "main/exhibitions.html", {"exhibitions": exhibitions})
+    current_exhibitions = Exhibition.objects.filter(status="current").order_by("date")
+    upcoming_exhibitions = Exhibition.objects.filter(status="upcoming").order_by("date")
+    past_exhibitions = Exhibition.objects.filter(status="past").order_by("-date")
+
+    context = {
+        "current_exhibitions": current_exhibitions,
+        "upcoming_exhibitions": upcoming_exhibitions,
+        "past_exhibitions": past_exhibitions,
+    }
+    return render(request, "main/exhibitions.html", context)
 
 
 # -------------------------
 # Projects
 # -------------------------
 def projects(request):
-    """Projects page with all projects"""
-    projects = Project.objects.filter(is_published=True).order_by("-created_at")
-    return render(request, "main/projects.html", {"projects": projects})
+    projects_qs = Project.objects.filter(is_published=True).order_by("-created_at")
+    return render(request, "main/projects.html", {"projects": projects_qs})
 
 
 # -------------------------
-# Services
+# Services (each page has its own template)
 # -------------------------
-def service_detail(request, slug):
-    """Generic service detail view"""
-    service = get_object_or_404(Service, slug=slug, is_published=True)
-    return render(request, "main/service_detail.html", {"service": service})
+
+def _service(request, service_name, template_name):
+    """
+    Loads a Service object based on its `name` field and renders using
+    a specific template in /services/.
+    """
+    service = get_object_or_404(Service, name=service_name, is_published=True)
+    all_services = Service.objects.filter(is_published=True).order_by("created_at")
+
+    return render(
+        request,
+        template_name,
+        {"service": service, "all_services": all_services},
+    )
 
 
-# Convenience wrappers for fixed URLs
 def composer(request):
-    return service_detail(request, slug="composer")
+    return _service(request, "composer", "main/services/composer.html")
 
 
 def post_production_audio(request):
-    return service_detail(request, slug="post-production-audio")
+    return _service(
+        request,
+        "post_production_audio",
+        "main/services/post-production-audio.html",
+    )
 
 
 def sound_design(request):
-    return service_detail(request, slug="sound-design")
+    return _service(
+        request,
+        "sound_design",
+        "main/services/sound-design.html",
+    )
 
 
 def sound_recordist(request):
-    return service_detail(request, slug="sound-recordist")
+    return _service(
+        request,
+        "sound_recordist",
+        "main/services/sound-recordist.html",
+    )

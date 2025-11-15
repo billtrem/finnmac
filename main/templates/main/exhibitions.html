@@ -1,15 +1,83 @@
 {% extends "main/base.html" %}
+
 {% block content %}
-<div class="exhibitions">
+<div class="exhibitions-page">
     <h1>Exhibitions</h1>
-    <ul>
-        {% for exhibition in exhibitions %}
-            <li>
-                <h2>{{ exhibition.title }}</h2>
-                <p>{{ exhibition.date }}</p>
-                <p>{{ exhibition.description }}</p>
-            </li>
-        {% endfor %}
-    </ul>
+
+    {% if current_exhibitions %}
+        <section class="exhibitions-section">
+            <h2>Current</h2>
+            <div class="exhibitions-group">
+                {% for exhibition in current_exhibitions %}
+                    <article class="exhibition-card">
+                        {% if exhibition.image %}
+                            <div class="exhibition-image">
+                                <img src="{{ exhibition.image.url }}" alt="{{ exhibition.title }}">
+                            </div>
+                        {% endif %}
+                        <div class="exhibition-text">
+                            <h3>{{ exhibition.title }}</h3>
+                            <p class="exhibition-meta">
+                                {{ exhibition.date|date:"j F Y" }} · {{ exhibition.location }}
+                            </p>
+                            <p>{{ exhibition.description }}</p>
+                        </div>
+                    </article>
+                {% endfor %}
+            </div>
+        </section>
+    {% endif %}
+
+    {% if upcoming_exhibitions %}
+        <section class="exhibitions-section">
+            <h2>Upcoming</h2>
+            <div class="exhibitions-group">
+                {% for exhibition in upcoming_exhibitions %}
+                    <article class="exhibition-card">
+                        {% if exhibition.image %}
+                            <div class="exhibition-image">
+                                <img src="{{ exhibition.image.url }}" alt="{{ exhibition.title }}">
+                            </div>
+                        {% endif %}
+                        <div class="exhibition-text">
+                            <h3>{{ exhibition.title }}</h3>
+                            <p class="exhibition-meta">
+                                {{ exhibition.date|date:"j F Y" }} · {{ exhibition.location }}
+                            </p>
+                            <p>{{ exhibition.description }}</p>
+                        </div>
+                    </article>
+                {% endfor %}
+            </div>
+        </section>
+    {% endif %}
+
+    {% if past_exhibitions %}
+        <section class="exhibitions-section">
+            <h2>Past</h2>
+            <div class="exhibitions-group">
+                {% for exhibition in past_exhibitions %}
+                    <article class="exhibition-card">
+                        {% if exhibition.image %}
+                            <div class="exhibition-image">
+                                <img src="{{ exhibition.image.url }}" alt="{{ exhibition.title }}">
+                            </div>
+                        {% endif %}
+                        <div class="exhibition-text">
+                            <h3>{{ exhibition.title }}</h3>
+                            <p class="exhibition-meta">
+                                {{ exhibition.date|date:"j F Y" }} · {{ exhibition.location }}
+                            </p>
+                            <p>{{ exhibition.description }}</p>
+                        </div>
+                    </article>
+                {% endfor %}
+            </div>
+        </section>
+    {% endif %}
+
+    {% if not current_exhibitions and not upcoming_exhibitions and not past_exhibitions %}
+        <p>No exhibitions to display at the moment.</p>
+    {% endif %}
 </div>
 {% endblock %}
